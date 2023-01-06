@@ -3,12 +3,32 @@ from settings import *
 from map import *
 
 
+def generate_level(level):
+    new_player, x, y = None, None, None
+    for y in range(len(level)):
+        for x in range(len(level[y][0])):
+            if level[y][0][x] == '#':
+                Tile('grass', x, y)
+            elif level[y][0][x] == 'B':
+                Tile('box', x, y)
+            elif level[y][0][x] == 'S':
+                Tile('ship', x, y)
+            elif level[y][0][x] == '@':
+                new_player = Player(x * 50, y * 50 - 20, all_sprites)
+    return new_player, x, y
+
+
 class Tile(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
+        self.star_pos = (pos_x, pos_y)
         self.image = tile_images[tile_type]
+        self.kill = False
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
+        if tile_type == 'ship':
+            self.rect.y += 25
+            self.kill = True
 
 
 class Player(pygame.sprite.Sprite):
@@ -25,6 +45,7 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, x, y, *group):
         super().__init__(*group)
         self.image = Player.image_stand
+        self.star_pos = (x, y)
         self.rect = self.image.get_rect()
         self.rect.x, self.rect.y = x, y
         self.run_right = [Player.image_run_r1, Player.image_run_r2, Player.image_run_r3, Player.image_run_r4,
@@ -47,7 +68,7 @@ class Player(pygame.sprite.Sprite):
             self.jump = True
             sdwig = True
             self.poden = -15
-        if not keys[pygame.K_SPACE]:
+        if not keys[pygame.K_SPACE] and self.poden > 0:
             sdwig = True
             self.jump = False
         if keys[pygame.K_d] and self.rect.x + 50 <= width:
@@ -90,18 +111,30 @@ class Player(pygame.sprite.Sprite):
             self.image = Player.image_stand
 
         # анимация прыжка
-        if self.poden < 10:
+        if self.poden < 0:
             if self.naprav == 'left':
                 self.image = pygame.transform.flip(Player.image_jump, True, False)
             else:
                 self.image = Player.image_jump
 
+        # проверка пересечений
         for element in tiles_group:
-            if element.rect.colliderect(self.rect.x, self.rect.y, lang_x, lang_y):
+            if element.rect.colliderect(self.rect.x + x, self.rect.y - 1, lang_x, lang_y):
+                x = 0
+                if element.kill:
+                    x, y = 0, 0
+                    self.rect.x, self.rect.y = self.star_pos[0], self.star_pos[1]
+
+            if element.rect.colliderect(self.rect.x + 1, self.rect.y + y, lang_x, lang_y):
                 if self.poden < 0:
                     y = element.rect.bottom - self.rect.top
+                    self.poden = 0
                 elif self.poden >= 0:
                     y = element.rect.top - self.rect.bottom
+                    self.poden = 0
+                if element.kill:
+                    x, y = 0, 0
+                    self.rect.x, self.rect.y = self.star_pos[0], self.star_pos[1]
 
         self.rect.x += x
         self.rect.y += y

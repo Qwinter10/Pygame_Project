@@ -13,7 +13,7 @@ pygame.init()
 screen = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 
-lang_x = 50
+lang_x = 34
 lang_y = 50
 
 all_sprites = pygame.sprite.Group()
@@ -40,6 +40,8 @@ def load_image(name, colorkey=None):
 
 
 tile_images = {
-    'wall': load_image('box.png'),
-    'empty': load_image('grass.png')
+    'box': load_image('box.png'),
+    'grass': load_image('trava.png'),
+    'empty': load_image('grass.png'),
+    'ship': load_image('ship2.png')
 }
