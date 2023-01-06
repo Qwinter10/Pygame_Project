@@ -43,5 +43,14 @@ tile_images = {
     'box': load_image('box.png'),
     'grass': load_image('trava.png'),
     'empty': load_image('grass.png'),
-    'ship': load_image('ship2.png')
+    'ship': load_image('ship2.png'),
+    'green_slime': load_image('green_slime.png'),
+    'door': load_image('door.png')
 }
+
+button = pygame.mixer.Sound('music/push_button.mp3')
+button.set_volume(0.3)
+
+die = pygame.mixer.Sound('music/die.mp3')
+die.set_volume(0.1)
+

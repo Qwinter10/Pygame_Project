@@ -13,6 +13,10 @@ def generate_level(level):
                 Tile('box', x, y)
             elif level[y][0][x] == 'S':
                 Tile('ship', x, y)
+            elif level[y][0][x] == 'G':
+                Tile('green_slime', x, y)
+            elif level[y][0][x] == 'D':
+                Tile('door', x, y)
             elif level[y][0][x] == '@':
                 new_player = Player(x * 50, y * 50 - 20, all_sprites)
     return new_player, x, y
@@ -21,14 +25,33 @@ def generate_level(level):
 class Tile(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
-        self.star_pos = (pos_x, pos_y)
+        self.star_pos = (tile_width * pos_x, tile_height * pos_y)
         self.image = tile_images[tile_type]
         self.kill = False
+        self.type = tile_type
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
         if tile_type == 'ship':
             self.rect.y += 25
             self.kill = True
+        if tile_type == 'green_slime':
+            self.kill = True
+            self.naprav = 'right'
+        if tile_type == 'door':
+            self.rect.y += 9
+
+    def update(self):
+        if self.type == 'green_slime':
+            if self.naprav == 'left':
+                self.rect.x -= 1
+                if self.rect.x + 50 < self.star_pos[0]:
+                    self.image = tile_images[self.type]
+                    self.naprav = 'right'
+            else:
+                self.rect.x += 1
+                if self.rect.x - 50 > self.star_pos[0]:
+                    self.naprav = 'left'
+                    self.image = pygame.transform.flip(tile_images[self.type], True, False)
 
 
 class Player(pygame.sprite.Sprite):
@@ -51,24 +74,31 @@ class Player(pygame.sprite.Sprite):
         self.run_right = [Player.image_run_r1, Player.image_run_r2, Player.image_run_r3, Player.image_run_r4,
                           Player.image_run_r5, Player.image_run_r6]
         self.jump = False
+        self.stoit = True
         self.count = 21
         self.naprav = None
         self.speed = 1
         self.poden = 0
         self.dwiz = -1
+        self.moving = False
+        self.jumping = 0
+        self.counter = 0
 
     def movement(self):
         keys = pygame.key.get_pressed()
         sdwig = False
+        self.moving = False
         x = 0
         y = 0
 
         # За что отвечают клавиши
-        if keys[pygame.K_SPACE] and not self.jump:
+        if keys[pygame.K_SPACE] and self.jumping < 2 and not self.jump:
             self.jump = True
             sdwig = True
+            self.stoit = False
+            self.jumping += 1
             self.poden = -15
-        if not keys[pygame.K_SPACE] and self.poden > 0:
+        if not keys[pygame.K_SPACE]:
             sdwig = True
             self.jump = False
         if keys[pygame.K_d] and self.rect.x + 50 <= width:
@@ -76,13 +106,13 @@ class Player(pygame.sprite.Sprite):
             self.dwiz += 1
             self.naprav = 'right'
             sdwig = True
-        if keys[pygame.K_s] and self.rect.y + 5 >= height - lang_y:
-            y += 5
+            self.moving = True
         if keys[pygame.K_a] and self.rect.x >= 0:
             x -= 5
             self.dwiz += 1
             self.naprav = 'left'
             sdwig = True
+            self.moving = True
         if not keys[pygame.K_a] and not keys[pygame.K_d]:
             self.dwiz = -1
 
@@ -121,9 +151,19 @@ class Player(pygame.sprite.Sprite):
         for element in tiles_group:
             if element.rect.colliderect(self.rect.x + x, self.rect.y - 1, lang_x, lang_y):
                 x = 0
+                if element.type == 'door':
+                    etap[0] = etap[0] + 1
                 if element.kill:
+                    die.play()
                     x, y = 0, 0
                     self.rect.x, self.rect.y = self.star_pos[0], self.star_pos[1]
+                    for el in tiles_group:
+                        el.rect.x = el.star_pos[0]
+                        el.rect.y = el.star_pos[1]
+                        if el.type == 'ship':
+                            el.rect.y = el.star_pos[1] + 25
+                        if el.type == 'door':
+                            el.rect.y = el.star_pos[1] + 9
 
             if element.rect.colliderect(self.rect.x + 1, self.rect.y + y, lang_x, lang_y):
                 if self.poden < 0:
@@ -132,9 +172,29 @@ class Player(pygame.sprite.Sprite):
                 elif self.poden >= 0:
                     y = element.rect.top - self.rect.bottom
                     self.poden = 0
+                if element.type == 'door':
+                    etap[0] = etap[0] + 1
                 if element.kill:
+                    die.play()
                     x, y = 0, 0
                     self.rect.x, self.rect.y = self.star_pos[0], self.star_pos[1]
+                    for el in tiles_group:
+                        el.rect.x = el.star_pos[0]
+                        el.rect.y = el.star_pos[1]
+                        if el.type == 'ship':
+                            el.rect.y = el.star_pos[1] + 25
+                        if el.type == 'door':
+                            el.rect.y = el.star_pos[1] + 9
+
+            if element.rect.colliderect(self.rect.x, self.rect.y + 1, lang_x, lang_y):
+                self.stoit = True
+
+        if self.stoit:
+            self.counter += 1
 
         self.rect.x += x
         self.rect.y += y
+        if self.stoit:
+            self.jumping = 0
+        if self.counter == 30:
+            self.counter = 0
