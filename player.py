@@ -17,6 +17,8 @@ def generate_level(level):
                 Tile('green_slime', x, y)
             elif level[y][0][x] == 'D':
                 Tile('door', x, y)
+            elif level[y][0][x] == 'O':
+                Tile('obrat_door', x, y)
             elif level[y][0][x] == '@':
                 new_player = Player(x * 50, y * 50 - 20, all_sprites)
     return new_player, x, y
@@ -37,10 +39,11 @@ class Tile(pygame.sprite.Sprite):
         if tile_type == 'green_slime':
             self.kill = True
             self.naprav = 'right'
-        if tile_type == 'door':
+        if tile_type == 'door' or tile_type == 'obrat_door':
             self.rect.y += 9
 
     def update(self):
+        # Движение зелёного слайма
         if self.type == 'green_slime':
             if self.naprav == 'left':
                 self.rect.x -= 1
@@ -95,6 +98,7 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE] and self.jumping < 2 and not self.jump:
             self.jump = True
             sdwig = True
+            print(self.rect.top)
             self.stoit = False
             self.jumping += 1
             self.poden = -15
@@ -153,6 +157,8 @@ class Player(pygame.sprite.Sprite):
                 x = 0
                 if element.type == 'door':
                     etap[0] = etap[0] + 1
+                if element.type == 'obrat_door':
+                    etap[0] = etap[0] - 1
                 if element.kill:
                     die.play()
                     x, y = 0, 0
@@ -162,7 +168,7 @@ class Player(pygame.sprite.Sprite):
                         el.rect.y = el.star_pos[1]
                         if el.type == 'ship':
                             el.rect.y = el.star_pos[1] + 25
-                        if el.type == 'door':
+                        if el.type == 'door' or el.type == 'obrat_door':
                             el.rect.y = el.star_pos[1] + 9
 
             if element.rect.colliderect(self.rect.x + 1, self.rect.y + y, lang_x, lang_y):
@@ -174,6 +180,8 @@ class Player(pygame.sprite.Sprite):
                     self.poden = 0
                 if element.type == 'door':
                     etap[0] = etap[0] + 1
+                if element.type == 'obrat_door':
+                    etap[0] = etap[0] - 1
                 if element.kill:
                     die.play()
                     x, y = 0, 0
@@ -183,7 +191,7 @@ class Player(pygame.sprite.Sprite):
                         el.rect.y = el.star_pos[1]
                         if el.type == 'ship':
                             el.rect.y = el.star_pos[1] + 25
-                        if el.type == 'door':
+                        if el.type == 'door' or el.type == 'obrat_door':
                             el.rect.y = el.star_pos[1] + 9
 
             if element.rect.colliderect(self.rect.x, self.rect.y + 1, lang_x, lang_y):

@@ -69,9 +69,13 @@ def level_one():
                 all_sprites.remove(el)
             for el in tiles_group:
                 tiles_group.remove(el)
+                if el.type == 'door' and etap[0] > check_etap:
+                    cord = (el.rect.x - 50, el.rect.y)
             for el in player_group:
                 player_group.remove(el)
             player, level_x, level_y = generate_level(first_level[etap[0]])
+            if etap[0] < check_etap:
+                player.rect.x, player.rect.y = cord[0], cord[1]
             check_etap = etap[0]
 
         screen.blit(fon, (0, 0))

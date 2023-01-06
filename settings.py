@@ -45,7 +45,8 @@ tile_images = {
     'empty': load_image('grass.png'),
     'ship': load_image('ship2.png'),
     'green_slime': load_image('green_slime.png'),
-    'door': load_image('door.png')
+    'door': load_image('door.png'),
+    'obrat_door': load_image('door.png')
 }
 
 button = pygame.mixer.Sound('music/push_button.mp3')
