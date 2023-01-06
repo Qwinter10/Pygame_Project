@@ -91,6 +91,7 @@ class Player(pygame.sprite.Sprite):
         keys = pygame.key.get_pressed()
         sdwig = False
         self.moving = False
+        pribav = True
         x = 0
         y = 0
 
@@ -98,7 +99,6 @@ class Player(pygame.sprite.Sprite):
         if keys[pygame.K_SPACE] and self.jumping < 2 and not self.jump:
             self.jump = True
             sdwig = True
-            print(self.rect.top)
             self.stoit = False
             self.jumping += 1
             self.poden = -15
@@ -157,6 +157,7 @@ class Player(pygame.sprite.Sprite):
                 x = 0
                 if element.type == 'door':
                     etap[0] = etap[0] + 1
+                    pribav = False
                 if element.type == 'obrat_door':
                     etap[0] = etap[0] - 1
                 if element.kill:
@@ -178,7 +179,7 @@ class Player(pygame.sprite.Sprite):
                 elif self.poden >= 0:
                     y = element.rect.top - self.rect.bottom
                     self.poden = 0
-                if element.type == 'door':
+                if element.type == 'door' and pribav:
                     etap[0] = etap[0] + 1
                 if element.type == 'obrat_door':
                     etap[0] = etap[0] - 1

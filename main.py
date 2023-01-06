@@ -44,6 +44,7 @@ def menu():
 
 
 def level_one():
+    background_forest.play(-1)
     running = True
     check_etap = etap[0]
     try:

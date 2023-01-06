@@ -55,3 +55,6 @@ button.set_volume(0.3)
 die = pygame.mixer.Sound('music/die.mp3')
 die.set_volume(0.1)
 
+background_forest = pygame.mixer.Sound('music/forest.wav')
+background_forest.set_volume(0.2)
+
