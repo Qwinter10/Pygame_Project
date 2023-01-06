@@ -65,9 +65,12 @@ def level_one():
         if etap[0] != check_etap:
             fon = pygame.transform.scale(load_image('fon.png'), (width, height))
             screen.blit(fon, (0, 0))
-            all_sprites.clear(screen, )
-            tiles_group.clear()
-            player_group.clear()
+            for el in all_sprites:
+                all_sprites.remove(el)
+            for el in tiles_group:
+                tiles_group.remove(el)
+            for el in player_group:
+                player_group.remove(el)
             player, level_x, level_y = generate_level(first_level[etap[0]])
             check_etap = etap[0]
 
