@@ -17,10 +17,13 @@ lang_x = 34
 lang_y = 50
 
 all_sprites = pygame.sprite.Group()
-horizontal_borders = pygame.sprite.Group()
-vertical_borders = pygame.sprite.Group()
 tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
+
+
+with open('level.txt', mode='rt', encoding='utf8') as f:
+    colvo_level = f.readline()
+    f.close()
 
 
 def load_image(name, colorkey=None):
@@ -46,7 +49,14 @@ tile_images = {
     'ship': load_image('ship2.png'),
     'green_slime': load_image('green_slime.png'),
     'door': load_image('door.png'),
-    'obrat_door': load_image('door.png')
+    'obrat_door': load_image('door.png'),
+    'stone':  load_image('stone.png'),
+    'exit': load_image('exit_door.png')
+}
+
+backgrounds = {
+    'forest': load_image('fon.png'),
+    'cave': load_image('cave_background.png')
 }
 
 button = pygame.mixer.Sound('music/push_button.mp3')
@@ -56,5 +66,8 @@ die = pygame.mixer.Sound('music/die.mp3')
 die.set_volume(0.1)
 
 background_forest = pygame.mixer.Sound('music/forest.wav')
-background_forest.set_volume(0.2)
+background_forest.set_volume(0.1)
+
+background_cave = pygame.mixer.Sound('music/cave.wav')
+background_cave.set_volume(0.3)
 

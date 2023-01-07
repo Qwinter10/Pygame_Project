@@ -19,6 +19,10 @@ def generate_level(level):
                 Tile('door', x, y)
             elif level[y][0][x] == 'O':
                 Tile('obrat_door', x, y)
+            elif level[y][0][x] == 'E':
+                Tile('exit', x, y)
+            elif level[y][0][x] == 'K':
+                Tile('stone', x, y)
             elif level[y][0][x] == '@':
                 new_player = Player(x * 50, y * 50 - 20, all_sprites)
     return new_player, x, y
@@ -86,6 +90,7 @@ class Player(pygame.sprite.Sprite):
         self.moving = False
         self.jumping = 0
         self.counter = 0
+        self.end = False
 
     def movement(self):
         keys = pygame.key.get_pressed()
@@ -160,6 +165,9 @@ class Player(pygame.sprite.Sprite):
                     pribav = False
                 if element.type == 'obrat_door':
                     etap[0] = etap[0] - 1
+                    pribav = False
+                if element.type == 'exit':
+                    self.end = True
                 if element.kill:
                     die.play()
                     x, y = 0, 0
@@ -171,6 +179,9 @@ class Player(pygame.sprite.Sprite):
                             el.rect.y = el.star_pos[1] + 25
                         if el.type == 'door' or el.type == 'obrat_door':
                             el.rect.y = el.star_pos[1] + 9
+                        if el.type == 'green_slime':
+                            el.naprav = 'right'
+                            el.image = tile_images[el.type]
 
             if element.rect.colliderect(self.rect.x + 1, self.rect.y + y, lang_x, lang_y):
                 if self.poden < 0:
@@ -181,8 +192,11 @@ class Player(pygame.sprite.Sprite):
                     self.poden = 0
                 if element.type == 'door' and pribav:
                     etap[0] = etap[0] + 1
-                if element.type == 'obrat_door':
+                if element.type == 'obrat_door' and pribav:
                     etap[0] = etap[0] - 1
+                if element.type == 'exit':
+                    self.end = True
+                # Если персонаж умирает все спрайты обновляются до первого состояния
                 if element.kill:
                     die.play()
                     x, y = 0, 0
@@ -194,6 +208,9 @@ class Player(pygame.sprite.Sprite):
                             el.rect.y = el.star_pos[1] + 25
                         if el.type == 'door' or el.type == 'obrat_door':
                             el.rect.y = el.star_pos[1] + 9
+                        if el.type == 'green_slime':
+                            el.naprav = 'right'
+                            el.image = tile_images[el.type]
 
             if element.rect.colliderect(self.rect.x, self.rect.y + 1, lang_x, lang_y):
                 self.stoit = True
